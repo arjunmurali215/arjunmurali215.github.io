@@ -66,6 +66,9 @@ export async function getProjectData(slug: string): Promise<ProjectData> {
     // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents);
 
+    // Remove the first H1 from the content if it exists, as it is rendered separately in the page template
+    const contentWithoutTitle = matterResult.content.replace(/^#\s+.+$/m, '');
+
     // Use unified pipeline to convert markdown into HTML string
     const processedContent = await unified()
         .use(remarkParse)
@@ -76,7 +79,7 @@ export async function getProjectData(slug: string): Promise<ProjectData> {
         .use(rehypeKatex)
         .use(rehypeRewriteUrls, { slug })
         .use(rehypeStringify)
-        .process(matterResult.content);
+        .process(contentWithoutTitle);
 
     const contentHtml = processedContent.toString();
 
