@@ -1,8 +1,17 @@
+---
+title: "Go2 Quadruped Locomotion"
+date: "2024-08-20"
+excerpt: "Reinforcement learning pipeline for quadruped locomotion using Genesis and PPO."
+coverImage: "./assets/dog.mp4"
+---
+
 # Go2 Quadruped Locomotion Training — Project Report
 
 ## 1. Project Overview
 
 This project implements a reinforcement learning pipeline for training the Unitree Go2 quadruped robot to perform locomotion tasks including walking, running, and jumping. The system utilizes the Genesis physics engine for simulation and the RSL-RL library for Proximal Policy Optimization (PPO) training.
+
+![Go2 Locomotion](assets/dog.mp4)
 
 ### 1.1 System Architecture
 

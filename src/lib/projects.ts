@@ -35,20 +35,34 @@ export function getAllProjectSlugs() {
         .map(entry => entry.name);
 }
 
-// Custom plugin to rewrite image URLs
+// Custom plugin to rewrite image URLs and transform video files
 function rehypeRewriteUrls(options: { slug: string }) {
     return (tree: any) => {
         visit(tree, 'element', (node: any) => {
             if (node.tagName === 'img' && node.properties && node.properties.src) {
                 let src = node.properties.src as string;
-                // Check for relative paths (./assets or assets/)
+
+                // Rewrite relative paths
                 if (src.startsWith('./') || (!src.startsWith('/') && !src.startsWith('http'))) {
                     // Remove ./ prefix if present
                     if (src.startsWith('./')) {
                         src = src.substring(2);
                     }
                     // Prepend project slug path
-                    node.properties.src = `/projects/${options.slug}/${src}`;
+                    src = `/projects/${options.slug}/${src}`;
+                    node.properties.src = src;
+                }
+
+                if (src.endsWith('.mp4') || src.endsWith('.webm')) {
+                    node.tagName = 'video';
+                    node.properties.autoplay = true;
+                    node.properties.loop = true;
+                    node.properties.muted = true;
+                    node.properties.playsInline = true;
+                    // node.properties.controls = true; // Removed per user request for "default" play
+                    node.properties.width = '100%';
+                    node.properties.className = ['w-full', 'rounded-xl', 'border', 'border-white/10'];
+                    delete node.properties.alt;
                 }
             }
         });
@@ -63,14 +77,9 @@ export async function getProjectData(slug: string): Promise<ProjectData> {
     }
 
     const fileContents = fs.readFileSync(fullPath, 'utf8');
-
-    // Use gray-matter to parse the post metadata section
     const matterResult = matter(fileContents);
-
-    // Remove the first H1 from the content if it exists, as it is rendered separately in the page template
     const contentWithoutTitle = matterResult.content.replace(/^#\s+.+$/m, '');
 
-    // Use unified pipeline to convert markdown into HTML string
     const processedContent = await unified()
         .use(remarkParse)
         .use(remarkGfm)
@@ -85,22 +94,15 @@ export async function getProjectData(slug: string): Promise<ProjectData> {
 
     const contentHtml = processedContent.toString();
 
-    // Inference logic if frontmatter is missing
     let title = matterResult.data.title;
     let excerpt = matterResult.data.excerpt;
 
     if (!title) {
-        // Try to find the first H1
         const h1Match = matterResult.content.match(/^#\s+(.+)$/m);
-        if (h1Match) {
-            title = h1Match[1];
-        } else {
-            title = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-        }
+        title = h1Match ? h1Match[1] : slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
 
     if (!excerpt) {
-        // Try to find the first paragraph that is not a header
         const lines = matterResult.content.split('\n');
         for (const line of lines) {
             const trimmed = line.trim();
@@ -112,34 +114,43 @@ export async function getProjectData(slug: string): Promise<ProjectData> {
         if (!excerpt) excerpt = "No description available.";
     }
 
-    // Look for first image for cover if not specified
+    // Cover Image Logic
     let coverImage = matterResult.data.coverImage;
     if (!coverImage) {
         const imgMatch = matterResult.content.match(/!\[.*?\]\((.*?)\)/);
         if (imgMatch) {
             coverImage = imgMatch[1];
-            // Ensure path logic if it is relative
-            if (coverImage.startsWith('./')) {
-                coverImage = coverImage.replace('./', `/projects/${slug}/`);
-            } else if (!coverImage.startsWith('http') && !coverImage.startsWith('/')) {
-                coverImage = `/projects/${slug}/${coverImage}`;
-            }
+        }
+    }
+
+    // Apply path fixing to ANY cover image (whether from frontmatter or extracted)
+    if (coverImage) {
+        if (coverImage.startsWith('./')) {
+            coverImage = coverImage.replace('./', `/projects/${slug}/`);
+        } else if (!coverImage.startsWith('http') && !coverImage.startsWith('/')) {
+            coverImage = `/projects/${slug}/${coverImage}`;
         }
     }
 
 
     return {
+        ...matterResult.data,
         slug,
         contentHtml,
         title,
         excerpt,
         coverImage,
-        ...matterResult.data,
     };
 }
 
 export async function getAllProjects(): Promise<ProjectData[]> {
     const slugs = getAllProjectSlugs();
     const projects = await Promise.all(slugs.map(slug => getProjectData(slug)));
-    return projects;
+    // Sort projects by date
+    return projects.sort((a, b) => {
+        if (a.date && b.date) {
+            return a.date < b.date ? 1 : -1;
+        }
+        return 0;
+    });
 }

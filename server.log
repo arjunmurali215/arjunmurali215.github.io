@@ -1,0 +1,19 @@
+
+> temp_app@0.1.0 dev
+> node scripts/sync-projects.mjs && next dev
+
+Synced project: dexlite-grasp-synthesis
+Synced project: dual-arm-dataset
+Synced project: f1tenth
+Synced project: quadruped
+Project sync complete.
+  ▲ Next.js 13.5.6
+  - Local:        http://localhost:3000
+
+ ✓ Ready in 1373ms
+ ✓ Compiled /page in 1725ms (1711 modules)
+ ✓ Compiled in 1309ms (645 modules)
+ ✓ Compiled in 524ms (1711 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled /not-found in 1491ms (1702 modules)
+[?25h

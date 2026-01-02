@@ -1,271 +1,126 @@
-# Go2 Quadruped Locomotion Training — Project Report
+---
+title: "Go2 Quadruped Locomotion"
+date: "2024-08-20"
+excerpt: "Reinforcement learning pipeline for quadruped locomotion using Genesis and PPO."
+coverImage: "./assets/dog.mp4"
+---
 
-## 1. Project Overview
 
-This project implements a reinforcement learning pipeline for training the Unitree Go2 quadruped robot to perform locomotion tasks including walking, running, and jumping. The system utilizes the Genesis physics engine for simulation and the RSL-RL library for Proximal Policy Optimization (PPO) training.
+
+# Go2 Quadruped Locomotion
+
+**Abstract:** This report details the implementation of a locomotion control pipeline for the Unitree Go2 quadruped. By leveraging the Genesis physics engine for high-fidelity simulation and the RSL-RL library for efficient training, I developed a policy capable of robust walking, running, and jumping. The system uses Proximal Policy Optimization (PPO) to learn complex gaits in parallelized environments.
+
+![Go2 Locomotion](assets/dog.mp4)
+
+---
+
+## 1. Introduction: Learning to Walk
+
+Last year, I started delving into quadrupeds. I then stumbled upon ETH Zurich's Robotic Systems Lab (RSL)'s `rsl_rl` library. I wanted to see if I could use that framework to implement teleop on the **Unitree Go2**, just for my learning.
+
+The goal was straightforward: Use the existing tools to train a neural network that pilots the 12-DOF robot from scratch, enabling it to track velocity commands and perform dynamic maneuvers like jumping.
 
 ### 1.1 System Architecture
 
-The codebase consists of three primary components:
+The project leverages existing robust tools to build a specific application:
 
-| Module | Purpose |
-|--------|---------|
-| `quadruped_env.py` | Simulation environment wrapping Genesis physics |
-| `train.py` | Training orchestration with PPO via RSL-RL |
-| `evaluate.py` / `teleop.py` | Inference and interactive control |
+| Component | Role |
+|-----------|------|
+| **Genesis** | The physics simulation backend. Handles rigid body dynamics, collisions, and contacts. |
+| **RSL-RL** | The RL framework. I used this library to handle the PPO algorithm and training loop. |
+| **QuadrupedEnv** | The task implementation. A custom environment I wrote to interface Genesis with the RSL-RL framework. |
 
-Training runs 4096 parallel environments on GPU, with checkpoints saved to `checkpoints/<experiment_name>/`.
-
----
-
-## 2. Simulation Environment
-
-### 2.1 Scene Construction
-
-The simulation world is instantiated through Genesis with the following configuration:
-
-- **Timestep**: $\Delta t = 0.02$ s (50 Hz control frequency)
-- **Substeps**: 2 physics substeps per control step
-- **Constraint Solver**: Newton method with collision and joint limits enabled
-
-### 2.2 Robot Model
-
-<div align="center">
-    <img src="./assets/go2.png" alt="Go2 Robot" width="50%">
-    <p><em>Unitree Go2 quadruped robot</em></p>
-</div>
-
-The Go2 robot is loaded from URDF at `urdf/go2/urdf/go2.urdf`. Initial spawn configuration:
-
-| Parameter | Value |
-|-----------|-------|
-| Position | $(0, 0, 0.42)$ m |
-| Orientation | Identity quaternion $(1, 0, 0, 0)$ |
-
-A ground plane is added from `urdf/plane/plane.urdf` as a fixed entity.
-
-### 2.3 Joint Configuration
-
-The robot has 12 actuated degrees of freedom (3 per leg):
-
-| Leg | Joints |
-|-----|--------|
-| Front Right (FR) | `hip`, `thigh`, `calf` |
-| Front Left (FL) | `hip`, `thigh`, `calf` |
-| Rear Right (RR) | `hip`, `thigh`, `calf` |
-| Rear Left (RL) | `hip`, `thigh`, `calf` |
-
-Default standing angles $q_{default}$:
-
-$$q_{default} = \begin{bmatrix} 0.0 & 0.8 & -1.5 & 0.0 & 0.8 & -1.5 & 0.0 & 1.0 & -1.5 & 0.0 & 1.0 & -1.5 \end{bmatrix}^T$$
-
-Joint control uses PD position control with gains $K_p = 20.0$ and $K_d = 0.5$.
+Training is parallelized. Instead of running one robot at a time, I spawn **4096 environments** on the GPU. This allows the agent to collect experience steps much faster.
 
 ---
 
-## 3. State and Action Spaces
+## 2. The Simulation World
 
-### 3.1 Observation Space
+### 2.1 The Robot Model
 
-The policy receives a 48-dimensional observation vector $o_t \in \mathbb{R}^{48}$:
+The Unitree Go2 is a 12-DOF robot (3 actuators per leg). It is loaded into the Genesis simulation from its URDF description.
 
-| Component | Dimensions | Scaling Factor |
-|-----------|------------|----------------|
-| Body angular velocity $\omega$ | 3 | 0.25 |
-| Projected gravity vector | 3 | 1.0 |
-| Command vector $c$ | 5 | varies |
-| Joint position error $(q - q_{default})$ | 12 | 1.0 |
-| Joint velocities $\dot{q}$ | 12 | 0.05 |
-| Previous action $a_{t-1}$ | 12 | 1.0 |
-| Jump phase indicator | 1 | 1.0 |
 
-The command vector contains:
-$$c = \begin{bmatrix} v_x^{cmd} & v_y^{cmd} & \omega_z^{cmd} & z^{cmd} & h_{jump}^{cmd} \end{bmatrix}^T$$
 
-### 3.2 Action Space
+The joint configuration follows a standard quadruped layout:
+* **Abduction/Adduction (Hip)**
+* **Hip Flexion/Extension (Thigh)**
+* **Knee Flexion/Extension (Calf)**
 
-Actions $a_t \in \mathbb{R}^{12}$ represent residual joint position targets. The executed target is:
+I initialize the robot in a standing pose with joint angles pre-determined by me.
 
-$$q_{target} = q_{default} + \alpha \cdot a_t$$
-
-where $\alpha = 0.25$ is the action scaling factor. Actions are clipped to $[-100, 100]$.
-
-### 3.3 Action Delay
-
-The system implements one-step action delay to model real-world latency:
-
-$$q_{executed}(t) = q_{target}(t-1)$$
+Control is achieved via **PD position control** at the joint level. The policy outputs residual target angles, which are added to the default standing pose.
 
 ---
 
-## 4. Command Sampling
+## 3. Observation & Action Space
 
-Reference commands are resampled every 4 seconds during training. Two sampling strategies are employed:
+### 3.1 Observations ($O_t \in \mathbb{R}^{48}$)
+The policy receives a 48-dimensional vector containing proprioceptive data and task commands:
 
-### 4.1 Uniform Sampling
+* **Body State:** Base angular velocity, projected gravity vector (to know which way is down).
+* **Joint State:** Positions (error relative to default) and velocities.
+* **History:** The previous action taken (crucial for smoothness).
+* **Commands:** Target velocities ($v_x, v_y, \omega_z$), target height, and jump flags.
 
-| Command | Range |
-|---------|-------|
-| $v_x^{cmd}$ | $[-1.5, 1.5]$ m/s |
-| $v_y^{cmd}$ | $[-0.8, 0.8]$ m/s |
-| $\omega_z^{cmd}$ | $[-1.0, 1.0]$ rad/s |
-| $z^{cmd}$ | $[0.25, 0.35]$ m |
-| $h_{jump}^{cmd}$ | $[0.6, 1.0]$ m |
+### 3.2 Actions ($A_t \in \mathbb{R}^{12}$)
+The network outputs 12 values corresponding to target joint positions.
+$$q_{target} = q_{default} + 0.25 \cdot \text{Action}$$
 
-### 4.2 Velocity Scaling
-
-Velocity commands are scaled based on height deviation from nominal:
-
-$$\lambda_h = 0.5 + 0.5 \cdot \frac{|z^{cmd} - z_{nominal}|}{z_{max} - z_{nominal}}$$
-
-$$v_{xy}^{scaled} = \lambda_h \cdot v_{xy}^{cmd}$$
+To bridge the "sim-to-real" gap, I implemented a **one-step action delay**. The action computed at time $t$ is not applied until $t+1$, mimicking the communication latency of real hardware.
 
 ---
 
-## 5. Reward Function
+## 4. Rewards
 
-The total reward is a weighted sum of individual components, each scaled by $\Delta t$:
+### 4.1 Tracking Rewards
+The primary objective is to follow the user's command.
+* **Linear Velocity:** $r_{lin} = \exp(-\|v_{cmd} - v_{actual}\|^2 / \sigma^2)$
+* **Angular Velocity:** Similar exponential kernel for yaw rate.
 
-$$R_{total} = \sum_i w_i \cdot r_i \cdot \Delta t$$
+### 4.2 Survival & Style Penalties
+To prevent the robot from flailing or damaging itself, I added:
+* **Smoothness:** Penalize jerky changes in action ($\|a_t - a_{t-1}\|^2$).
+* **Nominal Pose:** Penalize deviating too far from the natural standing posture.
+* **Vertical Stability:** Penalize vertical body velocity when *not* jumping (we want walking, not bouncing).
 
-### 5.1 Velocity Tracking
-
-**Linear velocity tracking** ($w = 1.0$):
-$$r_{lin} = \exp\left( -\frac{\|v_{xy}^{cmd} - v_{xy}\|^2}{\sigma^2} \right)$$
-
-**Angular velocity tracking** ($w = 0.5$):
-$$r_{ang} = \exp\left( -\frac{(\omega_z^{cmd} - \omega_z)^2}{\sigma^2} \right)$$
-
-where $\sigma = 0.25$ is the tracking bandwidth.
-
-### 5.2 Regularization Terms
-
-**Vertical velocity penalty** ($w = -2.0$):
-$$r_{vz} = v_z^2 \cdot \mathbb{1}_{not\_jumping}$$
-
-**Height tracking** ($w = -50.0$):
-$$r_{height} = (z - z^{cmd})^2 \cdot \mathbb{1}_{not\_jumping}$$
-
-**Action smoothness** ($w = -0.01$):
-$$r_{smooth} = \|a_t - a_{t-1}\|^2 \cdot \mathbb{1}_{not\_jumping}$$
-
-**Default pose similarity** ($w = -0.1$):
-$$r_{pose} = \|q - q_{default}\|_1 \cdot \mathbb{1}_{not\_jumping}$$
-
-### 5.3 Jump Rewards
-
-Jump behavior is governed by a finite state machine with a 50-step cycle. During the peak phase (steps 15-30):
-
-**Height tracking** ($w = 500.0$):
-$$r_{jump\_h} = \exp\left( -(z - h_{jump}^{target})^2 \right) \cdot \mathbb{1}_{peak}$$
-
-**Achievement bonus** ($w = 100.0$):
-$$r_{achieve} = \mathbb{1}_{|z - h_{jump}^{target}| < 0.2} \cdot \mathbb{1}_{peak}$$
-
-**Vertical speed** ($w = 100.0$):
-$$r_{speed} = 0.2 \cdot \exp(v_z) \cdot \mathbb{1}_{peak}$$
-
-**Landing penalty** ($w = 1.0$):
-$$r_{land} = -(z - z_{nominal})^2 \cdot \mathbb{1}_{landing}$$
+### 4.3 The Jump Logic
+Jumping is handled via a Finite State Machine (FSM) inside the reward function. When the "jump" command is active:
+1.  **Preparation:** Penalties relax to allow crouching.
+2.  **Peak:** Massive rewards for matching target jump height ($500 \times$ weight) and vertical velocity.
+3.  **Landing:** Rewards switch to stabilizing the base.
 
 ---
 
-## 6. Episode Termination
+## 5. Training with PPO
 
-Episodes terminate under the following conditions:
+I trained the policy using Proximal Policy Optimization (PPO) provided by the **RSL-RL** library. The actor and critic networks are simple Multi-Layer Perceptrons (MLP) with ELU activations:
+`Input (48) -> 512 -> 256 -> 128 -> Output`
 
-| Condition | Threshold |
-|-----------|-----------|
-| Episode timeout | $t > 1000$ steps (20 s) |
-| Excessive pitch | $|\theta_{pitch}| > 10°$ |
-| Excessive roll | $|\theta_{roll}| > 10°$ |
+**Training Stats:**
+* **Environments:** 4096
+* **Iterations:** 1500 (taking approx. 30-45 mins on an RTX 4050)
 
-Upon termination, the environment resets joints to $q_{default}$ and base pose to initial configuration.
-
----
-
-## 7. Training Configuration
-
-### 7.1 PPO Hyperparameters
-
-| Parameter | Value |
-|-----------|-------|
-| Clip parameter $\epsilon$ | 0.2 |
-| Discount factor $\gamma$ | 0.99 |
-| GAE parameter $\lambda$ | 0.95 |
-| Learning rate | $10^{-3}$ (adaptive) |
-| Mini-batches | 4 |
-| Epochs per update | 5 |
-| Entropy coefficient | 0.01 |
-| Value loss coefficient | 1.0 |
-| Max gradient norm | 1.0 |
-| Target KL divergence | 0.01 |
-
-### 7.2 Network Architecture
-
-Both actor and critic networks use MLP architecture:
-
-$$\text{Input}(48) \rightarrow 512 \rightarrow 256 \rightarrow 128 \rightarrow \text{Output}$$
-
-- Activation: ELU
-- Initial action noise std: 1.0
-
-### 7.3 Training Scale
-
-| Parameter | Value |
-|-----------|-------|
-| Parallel environments | 4096 |
-| Steps per environment per update | 24 |
-| Batch size | $4096 \times 24 = 98304$ |
-| Default iterations | 1500 |
-| Checkpoint interval | 100 iterations |
+The massive batch size creates a very stable gradient estimate, allowing for aggressive learning rates without destabilizing the policy.
 
 ---
 
-## 8. Inference and Evaluation
+## 6. Evaluation & Teleoperation
 
-### 8.1 Evaluation Mode
+After training, I validated the policy using a custom teleoperation script. This maps keyboard inputs to the command vector, allowing me to drive the robot around the simulation in real-time.
 
-The evaluation script loads trained checkpoints and runs single-environment inference with relaxed termination thresholds (pitch/roll limits increased to 50°). Velocity commands vary sinusoidally:
+| Key | Command | Effect |
+|-----|---------|--------|
+| **W / S** | $v_x$ | Move Forward / Backward |
+| **A / D** | $v_y$ | Strafe Left / Right |
+| **Q / E** | $\omega_z$ | Turn Left / Right |
+| **J** | Jump | Trigger jump maneuver |
 
-$$v_x(t) = v_{min} + \frac{v_{max} - v_{min}}{2} \left(1 + \sin\left(\frac{2\pi t}{T}\right)\right)$$
-
-with $v_{min} = 0.5$, $v_{max} = 4.0$, and period $T = 600$ steps.
-
-### 8.2 Teleoperation
-
-Interactive control supports real-time command adjustment:
-
-| Key | Action | Increment |
-|-----|--------|-----------|
-| W/S | Forward/backward | ±0.1 m/s |
-| A/D | Lateral | ±0.1 m/s |
-| Q/E | Yaw rate | ±0.1 rad/s |
-| R/F | Base height | ±0.1 m |
-| J | Trigger jump | — |
-| U/M | Jump height | ±0.1 m |
+The policy proved robust to external disturbances, recovering quickly from pushes and maintaining balance even when transitioning rapidly between forward running and lateral strafing.
 
 ---
 
-## 9. File Structure
+## 7. Conclusion
 
-```
-src/
-├── quadruped_env.py    # Locomotion environment class
-├── train.py            # Training entry point
-├── evaluate.py         # Automated evaluation
-├── teleop.py           # Keyboard teleoperation
-└── checkpoints/        # Saved models and configs
-    └── <exp_name>/
-        ├── cfgs.pkl    # Serialized configuration
-        └── model_*.pt  # Policy checkpoints
-```
-
----
-
-## 10. References
-
-- Unitree Go2 Robot Documentation
-- Genesis Physics Engine
-- RSL-RL: Robotic Systems Lab RL Library
-- Schulman et al., "Proximal Policy Optimization Algorithms," 2017
+This project successfully demonstrated a  locomotion pipeline for the Go2. It was a good learning experience for me.

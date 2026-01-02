@@ -1,3 +1,10 @@
+---
+title: "Dual-Arm Grasp Dataset Generator"
+date: "2025-08-21"
+excerpt: "A pipeline for generating force-closure dual-arm grasp pairs."
+coverImage: "./assets/dual1.mp4"
+---
+
 # Dual-Arm Grasp Dataset Generator
 
 ## Abstract
@@ -30,6 +37,8 @@ This report presents a detailed theoretical analysis of a dual-arm grasp generat
 Dual-arm robotic manipulation enables handling of objects that are too large, heavy, or require coordinated forces for stable grasping. Unlike single-arm grasping, dual-arm configurations provide additional contact points, enabling more robust force distribution and the ability to resist external disturbances from multiple directions.
 
 The fundamental challenge in dual-arm grasp planning is to select two single-arm grasps that, when executed simultaneously, form a stable grasp configuration. This stability is formally characterized by the concept of **force closure**—the ability of the grasp to resist arbitrary external wrenches (forces and torques) applied to the object.
+
+![Example generated dual-arm grasp pair](assets/dual1.mp4)
 
 ### Key Contributions
 
