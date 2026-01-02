@@ -23,17 +23,17 @@ export default async function Home() {
             Currently at {resumeData.education[0].school}.
           </p>
 
-          <div className="mt-8 flex gap-4">
+          <div className="mt-8 flex items-center gap-8">
             <a
               href="/Resume.pdf"
               target="_blank"
-              className="inline-flex items-center text-sm font-medium text-primary hover:text-white transition-colors"
+              className="inline-flex items-center rounded-full bg-primary px-6 py-3 text-sm font-medium text-black transition-all hover:bg-primary/90 hover:scale-105"
             >
               Download Resume <Download className="ml-2 h-4 w-4" />
             </a>
             <Link
               href="/projects"
-              className="inline-flex items-center text-sm font-medium text-gray-400 hover:text-white transition-colors"
+              className="inline-flex items-center text-sm font-medium text-primary hover:text-white transition-colors"
             >
               View Projects <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
@@ -43,8 +43,11 @@ export default async function Home() {
 
       {/* Featured Projects - Chronological */}
       <section className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8 border-b border-white/10 pb-4">
+        <div className="mb-8 flex items-end justify-between border-b border-white/10 pb-4">
           <h2 className="text-xl font-bold text-white uppercase tracking-wider">Selected Works</h2>
+          <Link href="/projects" className="group flex items-center gap-2 text-sm font-mono text-primary transition-colors hover:text-white">
+            View All <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
         <div className="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
           {featuredProjects.map((project) => (

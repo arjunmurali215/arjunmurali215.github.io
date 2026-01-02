@@ -1,7 +1,7 @@
 ---
 title: "26th Roboracer Autonomous Racing Competition at Techfest, IIT Bombay"
 date: "2025-12-27"
-excerpt: "2nd Place at the 26th Roboracer Autonomous Racing Competition, Techfest IIT Bombay. (Placed 2nd overall)"
+excerpt: "2nd Place at the 26th Roboracer Autonomous Racing Competition, Techfest IIT Bombay."
 coverImage: "./assets/car.png"
 ---
 
@@ -24,6 +24,8 @@ However, the biggest adversary wasn't the geometry; it was the environment. The 
 December 23rd was Time Trials. Our strategy to balance speed with control paid off immediately. We went first, completing 32 laps in 5 minutes.
 
 We clocked our fastest lap at 9.2 seconds, securing the 1st place position in the time trial round. Confidence was high.
+
+![Time-Trials](assets/race.mp4)
 
 ## The Finals
 December 24th brought the Head-to-Head rounds. We carried our momentum forward, winning our first two races cleanly to qualify for the Grand Finals.
