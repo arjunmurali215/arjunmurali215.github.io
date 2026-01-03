@@ -97,7 +97,3 @@ As the paper notes, this hybrid approach leverages the best of both worlds: opti
 Replicating Dex1B was a lesson in the importance of hybrid approaches. Deep learning provides the intuition, and classical control theory provides the precision.
 
 I’m planning to extend this work by incorporating "Graspness" (learning which parts of an object are graspable) and potentially moving to dual-hand manipulation.
-
----
-
-**Code:  https://github.com/arjunmurali215/dexlite**
