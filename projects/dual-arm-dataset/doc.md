@@ -61,6 +61,8 @@ I implemented two specific pruning criteria:
 1.  **Wrist-to-Wrist Distance ($d_{w2w}$):** We project the gripper position backward along its approach vector to simulate the wrist/arm location. If the wrists are too close (< 0.1m), the arms will collide.
 2.  **Center-to-Center Distance ($d_{c2c}$):** We ensure the grasp points aren't identical.
 3.  **Axis Alignment:** We penalize pairs where the grippers have approach vectors too close to intersection. This makes a very significant difference for small objects.
+
+![Distances](assets/distances.jpeg)
 ---
 
 ## Phase 3: The Physics (Force Closure)

@@ -7,6 +7,8 @@ coverImage: "./assets/dual1.mp4"
 
 # Dual-Arm Grasp Dataset Generator
 
+**Code:  https://github.com/arjunmurali215/dual-arm-dataset**
+
 **Abstract:** While single-arm robotic grasping has seen massive datasets and benchmarks, dual-arm manipulation remains data-scarce. This post details my implementation of a pipeline that transforms single-arm grasp data into verified, force-closure dual-arm pairs. By adapting the logic from state-of-the-art research for cluttered, small-object scenarios, I aim to enable learning-based approaches for coordinated bimanual manipulation.
 
 ![Example generated dual-arm grasp pair](assets/dual1.mp4)
@@ -59,6 +61,8 @@ I implemented two specific pruning criteria:
 1.  **Wrist-to-Wrist Distance ($d_{w2w}$):** We project the gripper position backward along its approach vector to simulate the wrist/arm location. If the wrists are too close (< 0.1m), the arms will collide.
 2.  **Center-to-Center Distance ($d_{c2c}$):** We ensure the grasp points aren't identical.
 3.  **Axis Alignment:** We penalize pairs where the grippers have approach vectors too close to intersection. This makes a very significant difference for small objects.
+
+![Distances](assets/distances.jpeg)
 ---
 
 ## Phase 3: The Physics (Force Closure)
@@ -95,3 +99,4 @@ By shifting the base data from DexNet to GraspNet-1B and implementing better col
 ### References
 1. **GraspNet-1Billion**: Fang, H., et al. (CVPR 2020)
 2. **DG16M**: A Large-Scale Dual-Arm Grasp Dataset
+

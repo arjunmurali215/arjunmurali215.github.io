@@ -51,7 +51,19 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Custom Prose Styles */
+.custom-prose-content img,
+.custom-prose-content video {
+  max-width: 1024px !important;
+  width: 100% !important;
+  height: auto !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block;
 }

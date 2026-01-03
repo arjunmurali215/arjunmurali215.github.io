@@ -45,7 +45,7 @@ My implementation follows the core philosophy of the paper, integrating geometri
 1.  **The Neural Network:**
     The heart of the system is a conditional generative model. It starts with **PointNet**, which processes the object's point cloud to extract global geometric features and local features for specific surface points. These features are fed into a **Conditional Variational Autoencoder (CVAE)**.
 
-    
+    ![Network Architecture](./assets/architecture.jpeg)
 
     The CVAE structure allows for two distinct modes of operation:
     * **Dataset Expansion:** During training, we can input existing valid grasps along with the object features into the Encoder to map them to a latent space. By slightly varying the "associated point" (the target point on the object) or the latent vector, we can decode variations of known successful grasps, effectively multiplying our dataset.

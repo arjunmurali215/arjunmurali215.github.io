@@ -18,25 +18,40 @@ export default async function ProjectPage({ params }: { params: { slug: string }
 
             <header className="mb-12">
                 <h1 className="mb-4 text-4xl font-extrabold text-white sm:text-5xl">{project.title}</h1>
-                {project.repo && (
-                    <a
-                        href={project.repo} // Assuming user might add repo to frontmatter later
-                        target="_blank"
-                        className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20"
-                    >
-                        <Github className="mr-2 h-4 w-4" /> View Source
-                    </a>
-                )}
+
+                <div className="mb-6 flex flex-wrap items-center gap-4">
+                    {project.date && (
+                        <span className="text-gray-400 font-medium">
+                            {new Date(project.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </span>
+                    )}
+
+                    {project.repo && (
+                        <a
+                            href={project.repo} // Assuming user might add repo to frontmatter later
+                            target="_blank"
+                            className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20"
+                        >
+                            <Github className="mr-2 h-4 w-4" /> View Source
+                        </a>
+                    )}
+                </div>
             </header>
 
             {/* Markdown Content */}
             <div
-                className="prose prose-lg prose-invert max-w-none 
+                className="prose prose-lg prose-invert max-w-none custom-prose-content
         prose-headings:text-white prose-p:text-gray-300 prose-strong:text-white 
         prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-        prose-img:rounded-xl prose-img:border prose-img:border-white/10"
+        prose-img:border prose-img:border-white/10"
                 dangerouslySetInnerHTML={{ __html: project.contentHtml }}
             />
+
+            <div className="mt-16 border-t border-white/10 pt-8">
+                <Link href="/projects" className="inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors">
+                    <ArrowLeft className="mr-2 h-4 w-4" /> Back to Projects
+                </Link>
+            </div>
         </article>
     );
 }

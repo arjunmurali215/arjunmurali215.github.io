@@ -1,7 +1,7 @@
 ---
 title: "26th Roboracer Autonomous Racing Competition at Techfest, IIT Bombay"
 date: "2025-12-27"
-excerpt: "2nd Place at the 26th Roboracer Autonomous Racing Competition, Techfest IIT Bombay."
+excerpt: "2nd Place at the 26th Roboracer (F1Tenth) Autonomous Racing Competition, Techfest IIT Bombay."
 coverImage: "./assets/car.png"
 ---
 
@@ -14,6 +14,8 @@ From December 21st to 24th, 2025, my team—Team PulpFriction from BITS Pilani, 
 This event marked a significant milestone: it was the first time this competition was held in India. The second we caught a whiff of the announcement five months ago, we knew we had to be there. We immediately got to work. We got our car from performing wall following to forming a racing line, following it, overtaking, and more.
 
 In the end, we secured 2nd place in the competition overall. This is how the competition unfolded.
+
+![Car](assets/car.png)
 
 ## The Setup
 We got our first look at the track on December 22nd. Visually, the map appeared simple, it's width was an issue. The track was narrow—ranging only 1.2 to 1.5 meters in width—leaving very little margin for error during overtakes.

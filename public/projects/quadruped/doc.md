@@ -9,6 +9,8 @@ coverImage: "./assets/dog.mp4"
 
 # Go2 Quadruped Locomotion
 
+**Code:  https://github.com/arjunmurali215/ppo-doggy**
+
 **Abstract:** This report details the implementation of a locomotion control pipeline for the Unitree Go2 quadruped. By leveraging the Genesis physics engine for high-fidelity simulation and the RSL-RL library for efficient training, I developed a policy capable of robust walking, running, and jumping. The system uses Proximal Policy Optimization (PPO) to learn complex gaits in parallelized environments.
 
 ![Go2 Locomotion](assets/dog.mp4)
@@ -17,7 +19,7 @@ coverImage: "./assets/dog.mp4"
 
 ## 1. Introduction: Learning to Walk
 
-Last year, I started delving into quadrupeds. I then stumbled upon ETH Zurich's Robotic Systems Lab (RSL)'s `rsl_rl` library. I wanted to see if I could use that framework to implement teleop on the **Unitree Go2**, just for my learning.
+Sometime back, I started delving into quadrupeds. I then stumbled upon ETH Zurich's Robotic Systems Lab (RSL)'s `rsl_rl` library. I wanted to see if I could use that framework to implement teleop on the **Unitree Go2**, just for my learning.
 
 The goal was straightforward: Use the existing tools to train a neural network that pilots the 12-DOF robot from scratch, enabling it to track velocity commands and perform dynamic maneuvers like jumping.
 
