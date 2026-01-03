@@ -7,6 +7,8 @@ coverImage: "./assets/dexlite.mp4"
 
 # DexLite: Replicating State-of-the-Art Dexterous Grasping (On a Budget)
 
+**Code:  https://github.com/arjunmurali215/dexlite**
+
 > **Note:** This project is an implementation of the grasp synthesis methodology presented in the paper **Dex1B: Learning with 1B Demonstrations for Dexterous Manipulation**. The neural network architecture and energy functions described herein are based on their published work, adapted for consumer hardware.
 
 **Abstract:** This post details my journey building DexLite, a learning-based system for synthesizing dexterous grasps on a Shadow Hand. By adapting the massive-scale Dex1B pipeline for a standard laptop GPU, I explore the intersection of generative deep learning and physics-based optimization.
@@ -95,10 +97,7 @@ As the paper notes, this hybrid approach leverages the best of both worlds: opti
 Replicating Dex1B was a lesson in the importance of hybrid approaches. Deep learning provides the intuition, and classical control theory provides the precision.
 
 I’m planning to extend this work by incorporating "Graspness" (learning which parts of an object are graspable) and potentially moving to dual-hand manipulation.
-<!-- 
-If you are interested in the nitty-gritty math, the energy function implementations, or the full architecture, I have uploaded the full technical report below.
 
--->
 ---
 
-**Link to code:  https://github.com/arjunmurali215/dexlite**
+**Code:  https://github.com/arjunmurali215/dexlite**
