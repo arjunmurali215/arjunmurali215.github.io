@@ -1,6 +1,6 @@
 ---
 title: "Beetle: A Heavy-Duty Autonomous Testbed for ROS 2 Navigation"
-date: "2024-05-15"
+date: "2024-11-12"
 excerpt: "Built a 60kg payload skid-steer robot to learn ROS 2, SLAM, and Path Planning."
 coverImage: "./assets/beetle.jpg"
 ---

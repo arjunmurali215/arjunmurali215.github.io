@@ -1,6 +1,6 @@
 ---
 title: "Go2 Quadruped Locomotion"
-date: "2024-08-20"
+date: "2025-04-20"
 excerpt: "Reinforcement learning pipeline for quadruped locomotion using Genesis and PPO."
 coverImage: "./assets/dog.mp4"
 ---

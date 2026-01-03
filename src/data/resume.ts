@@ -26,7 +26,6 @@ export interface Position {
 export const resumeData = {
     name: "Arjun Murali",
     email: "arjunmurali215@gmail.com",
-    phone: "+91 9148494291",
     socials: [
         {
             platform: "LinkedIn",
@@ -42,27 +41,33 @@ export const resumeData = {
     education: [
         {
             school: "BITS Pilani, Hyderabad Campus",
-            degree: "B.E. Electronics and Instrumentation (Third Year)",
+            degree: "B.E. Electronics and Instrumentation (CGPA: 8.23/10)",
             year: "Aug 2023 – May 2027",
+            location: "Hyderabad, India"
+        },
+        {
+            school: "BITS Pilani, Hyderabad Campus",
+            degree: "Minor: Robotics and Automation (GPA: 9/10)",
+            year: "Aug 2024 – May 2027",
             location: "Hyderabad, India"
         }
     ] as Education[],
     skills: [
         {
             category: "Languages",
-            skills: ["Python", "C++", "Java", "Dart (Flutter)"]
+            skills: ["Python", "C++", "Java", "Flutter"]
         },
         {
             category: "Frameworks",
-            skills: ["PyTorch", "ROS 1 & 2", "Gazebo"]
+            skills: ["PyTorch", "OpenCV", "ROS 1 & 2", "Gazebo", "MuJoCo"]
         },
         {
             category: "Design Tools",
-            skills: ["SolidWorks", "Fusion 360"]
+            skills: ["SolidWorks", "Fusion 360", "KiCAD"]
         },
         {
-            category: "Concepts",
-            skills: ["Manipulators", "Computer Vision", "Kinematics", "SLAM"]
+            category: "Areas of Interest",
+            skills: ["Manipulators", "Computer Vision", "Kinematics"]
         }
     ] as SkillCategory[],
     leadership: [
@@ -71,9 +76,9 @@ export const resumeData = {
             organization: "Automation and Robotics Club, BITS Hyderabad",
             period: "Apr 2025 – Present",
             description: [
-                "Spearheading educational initiatives by organizing hands-on workshops on computer vision, CAD design, 3D printing, and microcontrollers, engaging over 150 students.",
-                "Serving as the official representative and primary liaison between the club, faculty, and external organizations.",
-                "Leading a 60-member core team to plan and execute flagship projects, inter-college competitions, and long-term technical goals."
+                "Leading one of the largest technical clubs on campus, managing a team of 60+ active members and mentoring junior projects.",
+                "Spearheaded educational initiatives by organizing hands-on workshops on Computer Vision, CAD, and Embedded Systems, impacting over 150 students.",
+                "Liaised with faculty and external organizations to secure funding and resources for student-led research initiatives."
             ]
         }
     ] as Position[]
