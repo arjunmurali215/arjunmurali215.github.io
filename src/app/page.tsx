@@ -4,9 +4,20 @@ import { ProjectCard } from '@/components/ProjectCard';
 import Link from 'next/link';
 import { ArrowRight, Download, GraduationCap, Trophy } from 'lucide-react';
 
+// Define the order of featured projects here
+const FEATURED_PROJECT_SLUGS = [
+  'dexlite-grasp-synthesis',
+  'f1tenth',
+  'dual-arm-dataset',
+];
+
 export default async function Home() {
   const allProjects = await getAllProjects();
-  const featuredProjects = allProjects.slice(0, 3); // Sorted by date in getAllProjects
+
+  // Filter and sort projects based on the manual list
+  const featuredProjects = FEATURED_PROJECT_SLUGS
+    .map(slug => allProjects.find(p => p.slug === slug))
+    .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
   return (
     <div className="flex flex-col gap-24 pb-20 pt-24">
@@ -17,7 +28,7 @@ export default async function Home() {
             {resumeData.name}
           </h1>
           <p className="mt-4 text-xl text-gray-400 font-light">
-            Robotics Engineer. Focus on Manipulators and Computer Vision.
+            Student Researcher. Focus on Manipulators and Computer Vision.
           </p>
           <p className="mt-2 text-gray-500">
             Currently at {resumeData.education[0].school}.
@@ -87,7 +98,7 @@ export default async function Home() {
                     <h3 className="text-lg font-bold text-white">{edu.school}</h3>
                     <span className="text-sm font-mono text-gray-500">{edu.year}</span>
                   </div>
-                  <p className="text-primary">{edu.degree}</p>
+                  <p className="text-primary whitespace-pre-line">{edu.degree}</p>
                   <p className="text-sm text-gray-500">{edu.location}</p>
                 </div>
               ))}

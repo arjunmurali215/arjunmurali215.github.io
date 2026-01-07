@@ -41,14 +41,8 @@ export const resumeData = {
     education: [
         {
             school: "BITS Pilani, Hyderabad Campus",
-            degree: "B.E. Electronics and Instrumentation (CGPA: 8.23/10)",
+            degree: "B.E. Electronics and Instrumentation (CGPA: 8.23/10)\nMinor in Robotics and Automation (GPA: 9/10)",
             year: "Aug 2023 – May 2027",
-            location: "Hyderabad, India"
-        },
-        {
-            school: "BITS Pilani, Hyderabad Campus",
-            degree: "Minor: Robotics and Automation (GPA: 9/10)",
-            year: "Aug 2024 – May 2027",
             location: "Hyderabad, India"
         }
     ] as Education[],

@@ -67,3 +67,21 @@
   margin-right: auto !important;
   display: block;
 }
+
+/* KaTeX Math Styles */
+.custom-prose-content .katex-display {
+  display: block !important;
+  text-align: center !important;
+  margin: 1.5rem auto !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  max-width: 100%;
+  padding: 0.5rem 0;
+}
+
+.custom-prose-content .katex-display>.katex {
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap;
+}

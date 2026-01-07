@@ -1,6 +1,7 @@
 import { getAllProjectSlugs, getProjectData } from '@/lib/projects';
 import Link from 'next/link';
-import { ArrowLeft, Github } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { GithubRepoCard } from '@/components/GithubRepoCard';
 
 export async function generateStaticParams() {
     const slugs = getAllProjectSlugs();
@@ -19,7 +20,7 @@ export default async function ProjectPage({ params }: { params: { slug: string }
             <header className="mb-12">
                 <h1 className="mb-4 text-4xl font-extrabold text-white sm:text-5xl">{project.title}</h1>
 
-                <div className="mb-6 flex flex-wrap items-center gap-4">
+                <div className="mb-6 flex flex-col gap-6">
                     {project.date && (
                         <span className="text-gray-400 font-medium">
                             {new Date(project.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -27,13 +28,7 @@ export default async function ProjectPage({ params }: { params: { slug: string }
                     )}
 
                     {project.repo && (
-                        <a
-                            href={project.repo} // Assuming user might add repo to frontmatter later
-                            target="_blank"
-                            className="inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white hover:bg-white/20"
-                        >
-                            <Github className="mr-2 h-4 w-4" /> View Source
-                        </a>
+                        <GithubRepoCard repoUrl={project.repo} />
                     )}
                 </div>
             </header>
